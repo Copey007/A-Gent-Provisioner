@@ -8,6 +8,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const { Resend } = require('resend');
 
 // Load provisioner logic
 const { Provisioner, ClientStore } = require('./provisioner');
@@ -15,6 +16,10 @@ const { Provisioner, ClientStore } = require('./provisioner');
 const PORT = process.env.PORT || 3000;
 const clientStore = new ClientStore(path.join(__dirname, 'clients'));
 const provisioner = new Provisioner(clientStore);
+
+// Resend client
+const resend = new Resend(process.env.RESEND_API_KEY);
+const FROM_EMAIL = process.env.FROM_EMAIL || 'A-Gent <noreply@a-gent.co>';
 
 // ─── Pending leads storage ─────────────────────────────────
 
@@ -38,12 +43,32 @@ function getLeads() {
   try { return JSON.parse(fs.readFileSync(LEADS_FILE, 'utf8')); } catch(e) { return []; }
 }
 
-// ─── Email sender (stub — replace with SendGrid/Postmark/etc.) ───
+// ─── Email sender (Resend) ──────────────────────────────────────────
 
 async function sendWelcomeEmail(email, name) {
-  // TODO: Wire up SendGrid, Postmark, or AWS SES
-  console.log(`[Email] Would send welcome email to ${email} (name: ${name})`);
-  return true;
+  if (!process.env.RESEND_API_KEY) {
+    console.log(`[Email] RESEND_API_KEY not set — skipping welcome email to ${email}`);
+    return false;
+  }
+  try {
+    await resend.emails.send({
+      from: FROM_EMAIL,
+      to: email,
+      subject: 'Welcome to A-Gent — Your AI sales agent is ready',
+      html: `
+        <h1>Welcome, ${name}!</h1>
+        <p>Your A-Gent AI sales agent is now set up and ready to work.</p>
+        <p>You'll receive a follow-up shortly with your agent credentials and next steps.</p>
+        <br/>
+        <p>— The A-Gent Team</p>
+      `,
+    });
+    console.log(`[Email] Welcome email sent to ${email}`);
+    return true;
+  } catch (err) {
+    console.error(`[Email] Failed to send to ${email}:`, err.message);
+    return false;
+  }
 }
 
 // ─── HTTP Server ────────────────────────────────────────────
