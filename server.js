@@ -51,16 +51,39 @@ async function sendWelcomeEmail(email, name) {
     return false;
   }
   try {
+    const loginUrl = 'https://dashboard.a-gent.co';
     await resend.emails.send({
       from: FROM_EMAIL,
       to: email,
-      subject: 'Welcome to A-Gent — Your AI sales agent is ready',
+      subject: 'Welcome to A-Gent — Your AI Sales Agent is Ready',
       html: `
-        <h1>Welcome, ${name}!</h1>
-        <p>Your A-Gent AI sales agent is now set up and ready to work.</p>
-        <p>You'll receive a follow-up shortly with your agent credentials and next steps.</p>
-        <br/>
-        <p>— The A-Gent Team</p>
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+          <div style="text-align: center; margin-bottom: 40px;">
+            <img src="https://a-gent.co/icons/logo.png" alt="A-Gent" width="64" height="64" style="border-radius: 12px;">
+            <h1 style="color: #f9f9f9; font-size: 28px; margin: 20px 0 10px;">Welcome${name ? ', ' + name : ''}!</h1>
+            <p style="color: #888; font-size: 16px;">Your AI sales agent is now active and ready to work.</p>
+          </div>
+
+          <div style="background: #111; border: 1px solid #222; border-radius: 16px; padding: 30px; margin-bottom: 30px;">
+            <h2 style="color: #c9a227; font-size: 18px; margin: 0 0 20px;">🚀 What happens next</h2>
+            <ol style="color: #ccc; font-size: 15px; line-height: 1.8; padding-left: 20px;">
+              <li>Check your OpenClaw dashboard for your AI agent</li>
+              <li>Your agent is researching prospects and building outreach lists</li>
+              <li>You'll receive a weekly performance report</li>
+              <li>Reply anytime — your agent works 24/7</li>
+            </ol>
+          </div>
+
+          <div style="background: #111; border: 1px solid #222; border-radius: 16px; padding: 30px; margin-bottom: 30px;">
+            <h2 style="color: #c9a227; font-size: 18px; margin: 0 0 20px;">🔑 Your agent dashboard</h2>
+            <a href="${loginUrl}" style="display: inline-block; background: #c9a227; color: #050508; padding: 14px 28px; border-radius: 10px; font-weight: 700; font-size: 16px; text-decoration: none;">Access Your Dashboard</a>
+            <p style="color: #666; font-size: 13px; margin-top: 15px;">Or visit: <a href="${loginUrl}" style="color: #888;">${loginUrl}</a></p>
+          </div>
+
+          <div style="background: #0a0a0a; border: 1px solid #c9a227; border-radius: 12px; padding: 24px; text-align: center;">
+            <p style="color: #c9a227; font-size: 14px; margin: 0;">💬 Need help? Message us on <a href="https://t.me/OpenClawSalesBot" style="color: #c9a227;">Telegram</a> — we respond within hours.</p>
+          </div>
+        </div>
       `,
     });
     console.log(`[Email] Welcome email sent to ${email}`);
