@@ -10,10 +10,11 @@ const path = require('path');
 const crypto = require('crypto');
 
 // Load provisioner logic
-const Provisioner = require('./provisioner');
+const { Provisioner, ClientStore } = require('./provisioner');
 
 const PORT = process.env.PORT || 3000;
-const provisioner = new Provisioner();
+const clientStore = new ClientStore(path.join(__dirname, 'clients'));
+const provisioner = new Provisioner(clientStore);
 
 // ─── Pending leads storage ─────────────────────────────────
 

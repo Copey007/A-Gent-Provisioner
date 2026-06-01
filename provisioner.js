@@ -417,7 +417,5 @@ async function startServer() {
   });
 }
 
-startServer().catch(err => {
-  console.error('[Provisioner] Failed to start:', err);
-  process.exit(1);
-});
+// Expose classes for use by server.js
+module.exports = { Provisioner, ClientStore, generateClientId };
