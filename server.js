@@ -45,17 +45,18 @@ function getLeads() {
 
 // ─── Email sender (Resend) ──────────────────────────────────────────
 
-async function sendWelcomeEmail(email, name) {
+async function sendWelcomeEmail(email, name, agent) {
   if (!process.env.RESEND_API_KEY) {
     console.log(`[Email] RESEND_API_KEY not set — skipping welcome email to ${email}`);
     return false;
   }
   try {
-    const loginUrl = 'https://dashboard.a-gent.co';
+    const agentLabel = agent ? (agent === 'signal' ? 'Signal A-Gent' : 'Outbound A-Gent') : 'A-Gent';
+    const loginUrl = `https://dashboard.a-gent.co?agent=${agent || ''}`;
     await resend.emails.send({
       from: FROM_EMAIL,
       to: email,
-      subject: 'Welcome to A-Gent — Your AI Sales Agent is Ready',
+      subject: `Welcome to A-Gent — Your ${agentLabel} is Ready`,
       html: `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
           <div style="text-align: center; margin-bottom: 40px;">
@@ -143,7 +144,7 @@ const server = http.createServer(async (req, res) => {
         saveLead(lead);
 
         // Send welcome email (async, don't block)
-        sendWelcomeEmail(email, name).catch(err => console.error('[Email] Error:', err.message));
+        sendWelcomeEmail(email, name, lead.agent).catch(err => console.error('[Email] Error:', err.message));
 
         console.log(`[Lead] New signup: ${name} <${email}> at ${company}`);
 
