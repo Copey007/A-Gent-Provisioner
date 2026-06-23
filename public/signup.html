@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Start with A-Gent</title>
+  <meta name="description" content="Choose your A-Gent — Signal (detects buying signals) or Outbound (runs autonomous email sequences). Free to start.">
+  <link rel="icon" href="https://a-gent.co/icons/logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --black: #050508;
+      --panel: #0d0d12;
+      --panel-2: #14141a;
+      --gold: #c9a227;
+      --gold-2: #ffd86b;
+      --green: #41ff9f;
+      --line: rgba(201, 162, 39, 0.25);
+      --text: #f4f1df;
+      --muted: #778374;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; min-height: 100%;
+      background: var(--black); color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-image:
+        radial-gradient(circle at 10% 0%, rgba(65, 255, 159, 0.05), transparent 28%),
+        radial-gradient(circle at 88% 12%, rgba(201, 162, 39, 0.10), transparent 26%);
+    }
+    .shell { max-width: 920px; margin: 0 auto; padding: 32px 20px 80px; }
+    header { display: flex; align-items: center; justify-content: space-between; padding-bottom: 40px; }
+    .wordmark { font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: 22px; color: var(--gold-2); letter-spacing: -0.02em; }
+    .wordmark span { color: var(--green); }
+    .back { color: var(--muted); font-size: 14px; text-decoration: none; font-family: 'IBM Plex Mono', monospace; }
+    .back:hover { color: var(--gold); }
+
+    h1 { font-size: clamp(32px, 5vw, 48px); font-weight: 700; line-height: 1.1; margin: 0 0 16px; letter-spacing: -0.02em; }
+    h1 .gold { color: var(--gold); }
+    .lede { font-size: 17px; color: #b8b8c0; margin: 0 0 40px; max-width: 620px; }
+
+    .step-label { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--gold); text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 14px; }
+
+    .agent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 36px; }
+    @media (max-width: 640px) { .agent-grid { grid-template-columns: 1fr; } }
+    .agent-card {
+      position: relative; cursor: pointer; padding: 28px 24px;
+      background: var(--panel); border: 1.5px solid var(--line);
+      border-radius: 18px; transition: all 0.15s ease;
+    }
+    .agent-card:hover { border-color: var(--gold); transform: translateY(-1px); }
+    .agent-card.selected { border-color: var(--gold); background: linear-gradient(180deg, rgba(201,162,39,0.06), transparent); box-shadow: 0 0 32px rgba(201,162,39,0.10); }
+    .agent-card input[type="radio"] { position: absolute; opacity: 0; pointer-events: none; }
+    .agent-card .check { position: absolute; top: 18px; right: 18px; width: 22px; height: 22px; border: 1.5px solid var(--line); border-radius: 50%; transition: all 0.15s; }
+    .agent-card.selected .check { background: var(--gold); border-color: var(--gold); box-shadow: inset 0 0 0 3px var(--panel); }
+    .agent-icon { font-size: 28px; color: var(--gold); margin-bottom: 12px; }
+    .agent-name { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 16px; color: var(--gold-2); margin-bottom: 6px; letter-spacing: 0.02em; }
+    .agent-tag { font-size: 12px; color: var(--green); font-family: 'IBM Plex Mono', monospace; margin-bottom: 14px; }
+    .agent-desc { font-size: 14px; color: #b8b8c0; line-height: 1.55; }
+    .agent-bullets { margin-top: 14px; padding-left: 0; list-style: none; font-size: 13px; color: var(--muted); }
+    .agent-bullets li { padding: 3px 0 3px 18px; position: relative; }
+    .agent-bullets li::before { content: "→"; position: absolute; left: 0; color: var(--gold); }
+
+    .form-card { background: var(--panel); border: 1px solid var(--line); border-radius: 22px; padding: 36px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px; }
+    .form-row.single { grid-template-columns: 1fr; }
+    @media (max-width: 640px) { .form-row { grid-template-columns: 1fr; } }
+    label { display: block; font-size: 13px; font-family: 'IBM Plex Mono', monospace; color: var(--gold-2); margin-bottom: 6px; }
+    input {
+      width: 100%; padding: 14px 16px;
+      background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px;
+      color: var(--text); font-size: 15px; font-family: inherit; transition: border-color 0.15s;
+    }
+    input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,162,39,0.15); }
+    input::placeholder { color: var(--muted); }
+
+    .submit {
+      width: 100%; padding: 16px; margin-top: 10px;
+      background: var(--gold); color: var(--black);
+      border: none; border-radius: 10px;
+      font-size: 16px; font-weight: 700; font-family: 'IBM Plex Mono', monospace;
+      letter-spacing: 0.04em; cursor: pointer; transition: all 0.15s;
+    }
+    .submit:hover:not(:disabled) { background: var(--gold-2); transform: translateY(-1px); }
+    .submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .fineprint { margin-top: 18px; font-size: 12px; color: var(--muted); text-align: center; font-family: 'IBM Plex Mono', monospace; }
+    .fineprint a { color: var(--gold); text-decoration: none; }
+
+    .success-card { background: var(--panel); border: 1.5px solid var(--green); border-radius: 22px; padding: 48px 36px; text-align: center; display: none; }
+    .success-card.show { display: block; }
+    .success-icon { font-size: 56px; margin-bottom: 16px; }
+    .success-card h2 { color: var(--green); font-size: 28px; margin: 0 0 12px; }
+    .success-card p { color: #b8b8c0; font-size: 16px; margin: 0 0 28px; line-height: 1.6; }
+    .dash-btn { display: inline-block; padding: 14px 32px; background: var(--gold); color: var(--black); border-radius: 10px; text-decoration: none; font-weight: 700; font-family: 'IBM Plex Mono', monospace; }
+    .dash-btn:hover { background: var(--gold-2); }
+
+    .error { color: #ff5c7a; font-size: 13px; margin-top: 12px; display: none; font-family: 'IBM Plex Mono', monospace; }
+    .error.show { display: block; }
+  </style>
+</head>
+<body>
+<div class="shell">
+  <header>
+    <div class="wordmark">A<span>·</span>GENT</div>
+    <a class="back" href="https://a-gent.co">← Back to a-gent.co</a>
+  </header>
+
+  <div id="form-view">
+    <div class="step-label">STEP 01 — Choose your agent</div>
+    <h1>Which A-Gent do you want <span class="gold">running for you?</span></h1>
+    <p class="lede">Both agents work 24/7. Pick the one that closes the gap in your pipeline today. You can add the other anytime.</p>
+
+    <form id="signup-form" novalidate>
+      <div class="agent-grid">
+        <label class="agent-card" data-agent="signal">
+          <input type="radio" name="agent" value="signal" required>
+          <div class="check"></div>
+          <div class="agent-icon">◈</div>
+          <div class="agent-name">SIGNAL A-GENT</div>
+          <div class="agent-tag">// listens & alerts</div>
+          <div class="agent-desc">Detects buying signals across your accounts — job changes, hiring spikes, funding, exec moves — and alerts you the moment intent fires.</div>
+          <ul class="agent-bullets">
+            <li>Monitors 50+ signal sources</li>
+            <li>Daily Slack/email digest</li>
+            <li>Score each signal by ICP fit</li>
+          </ul>
+        </label>
+
+        <label class="agent-card" data-agent="outbound">
+          <input type="radio" name="agent" value="outbound" required>
+          <div class="check"></div>
+          <div class="agent-icon">◉</div>
+          <div class="agent-name">OUTBOUND A-GENT</div>
+          <div class="agent-tag">// writes & sends</div>
+          <div class="agent-desc">Runs autonomous email sequences triggered by signals. Researches accounts, drafts personalized emails, sends, and follows up — without you touching a keyboard.</div>
+          <ul class="agent-bullets">
+            <li>12-step GAP-anchored cadence</li>
+            <li>Personalized per account</li>
+            <li>Auto-pauses on reply</li>
+          </ul>
+        </label>
+      </div>
+
+      <div class="form-card">
+        <div class="step-label">STEP 02 — Where should we send it?</div>
+        <div class="form-row">
+          <div>
+            <label for="name">Name</label>
+            <input id="name" name="name" type="text" placeholder="Mark Cope" required autocomplete="name">
+          </div>
+          <div>
+            <label for="company">Company</label>
+            <input id="company" name="company" type="text" placeholder="Acme Inc." required autocomplete="organization">
+          </div>
+        </div>
+        <div class="form-row single">
+          <div>
+            <label for="email">Work email</label>
+            <input id="email" name="email" type="email" placeholder="you@company.com" required autocomplete="email">
+          </div>
+        </div>
+        <button type="submit" class="submit" id="submit-btn" disabled>SELECT AN AGENT TO CONTINUE</button>
+        <div class="error" id="error-msg"></div>
+        <div class="fineprint">
+          By submitting you agree to receive product emails. <a href="https://a-gent.co/privacy">Privacy</a>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="success-card" id="success-view">
+    <div class="success-icon">✓</div>
+    <h2>Your <span id="success-agent">A-Gent</span> is activated.</h2>
+    <p>Check your inbox — welcome email is on the way with your dashboard link.<br>Your agent starts working immediately.</p>
+    <a class="dash-btn" id="dash-link" href="#">OPEN YOUR DASHBOARD →</a>
+  </div>
+</div>
+
+<script>
+  const cards = document.querySelectorAll('.agent-card');
+  const radios = document.querySelectorAll('input[name="agent"]');
+  const submitBtn = document.getElementById('submit-btn');
+  const form = document.getElementById('signup-form');
+  const errorMsg = document.getElementById('error-msg');
+
+  // Card selection
+  cards.forEach(card => {
+    card.addEventListener('click', () => {
+      cards.forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      const radio = card.querySelector('input[type="radio"]');
+      radio.checked = true;
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'ACTIVATE ' + card.querySelector('.agent-name').textContent + ' →';
+    });
+  });
+
+  // Form submit
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorMsg.classList.remove('show');
+
+    const formData = new FormData(form);
+    const data = {
+      name: formData.get('name').trim(),
+      email: formData.get('email').trim(),
+      company: formData.get('company').trim(),
+      agent: formData.get('agent'),
+    };
+
+    if (!data.name || !data.email || !data.company || !data.agent) {
+      errorMsg.textContent = 'All fields required. Pick an agent and fill in your details.';
+      errorMsg.classList.add('show');
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'ACTIVATING...';
+
+    try {
+      const res = await fetch('/api/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok || !result.success) {
+        throw new Error(result.error || 'Signup failed');
+      }
+
+      // Success
+      document.getElementById('form-view').style.display = 'none';
+      document.getElementById('success-view').classList.add('show');
+      const agentLabel = data.agent === 'signal' ? 'Signal A-Gent' : 'Outbound A-Gent';
+      document.getElementById('success-agent').textContent = agentLabel;
+      document.getElementById('dash-link').href = result.dashboardUrl || 'https://dashboard.a-gent.co';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    } catch (err) {
+      errorMsg.textContent = err.message || 'Something went wrong. Try again or email mark@a-gent.co.';
+      errorMsg.classList.add('show');
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'TRY AGAIN';
+    }
+  });
+</script>
+</body>
+</html>

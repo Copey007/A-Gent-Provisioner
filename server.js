@@ -112,7 +112,7 @@ const server = http.createServer(async (req, res) => {
 
   // ── Serve static signup page
   if (req.method === 'GET' && (url.pathname === '/' || url.pathname === '/signup')) {
-    const filePath = path.join(__dirname, '..', 'sales-agent-web', 'signup.html');
+    const filePath = path.join(__dirname, 'public', 'signup.html');
     if (!fs.existsSync(filePath)) {
       res.writeHead(404);
       res.end('Not found');
@@ -130,26 +130,43 @@ const server = http.createServer(async (req, res) => {
     req.on('data', chunk => body += chunk);
     req.on('end', async () => {
       try {
-        const { name, email, company } = JSON.parse(body);
+        const { name, email, company, agent } = JSON.parse(body);
 
         if (!name || !email || !company) {
           res.writeHead(400, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ error: 'Missing required fields' }));
+          res.end(JSON.stringify({ error: 'Missing required fields: name, email, company' }));
           return;
         }
 
-        const lead = { name, email, company, utm: url.searchParams.get('utm') || 'direct' };
+        // Validate agent type — default to 'outbound' if not specified
+        const validAgents = ['signal', 'outbound'];
+        const agentType = validAgents.includes(agent) ? agent : 'outbound';
+
+        // Build lead with source format per architecture: signup:{agent}
+        const lead = {
+          name,
+          email,
+          company,
+          agent: agentType,
+          source: `signup:${agentType}`,
+          utm: url.searchParams.get('utm') || 'direct',
+        };
 
         // Save lead
         saveLead(lead);
 
         // Send welcome email (async, don't block)
-        sendWelcomeEmail(email, name, lead.agent).catch(err => console.error('[Email] Error:', err.message));
+        sendWelcomeEmail(email, name, agentType).catch(err => console.error('[Email] Error:', err.message));
 
-        console.log(`[Lead] New signup: ${name} <${email}> at ${company}`);
+        console.log(`[Lead] New signup: ${name} <${email}> at ${company} → ${agentType}`);
 
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ success: true, message: 'Lead captured' }));
+        res.end(JSON.stringify({
+          success: true,
+          message: 'Lead captured',
+          agent: agentType,
+          dashboardUrl: `https://dashboard.a-gent.co?agent=${agentType}`,
+        }));
 
       } catch (err) {
         console.error('[Server] Signup error:', err.message);
